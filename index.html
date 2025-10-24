@@ -38,20 +38,22 @@
             width: 100%;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: 60px;
         }
 
         nav {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1.5rem 2rem;
+            padding: 0 1rem;
+            height: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .logo {
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: var(--secondary);
             text-decoration: none;
@@ -83,22 +85,23 @@
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             list-style: none;
         }
 
         .nav-links a {
             color: var(--white);
             text-decoration: none;
-            font-size: 1rem;
+            font-size: 0.9rem;
             transition: color 0.3s, transform 0.3s;
             position: relative;
+            padding: 0.5rem 0;
         }
 
         .nav-links a::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: 0;
             left: 0;
             width: 0;
             height: 2px;
@@ -534,12 +537,51 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
+            header {
+                height: auto;
+            }
+
+            nav {
+                padding: 0.5rem 1rem;
+                position: relative;
+            }
+
+            .logo {
+                font-size: 1rem;
+                z-index: 2;
             }
 
             .nav-links {
-                gap: 1rem;
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--primary);
+                padding: 1rem;
+                flex-direction: column;
+                gap: 0.5rem;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 0.8rem;
+                width: 100%;
+                text-align: center;
+            }
+
+            .mobile-menu-btn {
+                display: block !important;
+                z-index: 2;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                padding-top: 2rem;
             }
 
             .timeline::before {
@@ -558,6 +600,25 @@
 
             .cards-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .nav-links a {
+                font-size: 0.9rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
             }
         }
 
@@ -883,39 +944,45 @@
 
         // Mobile Menu Toggle (for smaller screens)
         const createMobileMenu = () => {
-            if (window.innerWidth <= 768) {
-                const nav = document.querySelector('nav');
-                if (!document.querySelector('.mobile-menu-btn')) {
-                    const menuBtn = document.createElement('button');
-                    menuBtn.className = 'mobile-menu-btn';
-                    menuBtn.innerHTML = '☰';
-                    menuBtn.style.cssText = `
-                        background: none;
-                        border: none;
-                        color: white;
-                        font-size: 2rem;
-                        cursor: pointer;
-                        display: none;
-                    `;
+            const nav = document.querySelector('nav');
+            if (!document.querySelector('.mobile-menu-btn')) {
+                const menuBtn = document.createElement('button');
+                menuBtn.className = 'mobile-menu-btn';
+                menuBtn.innerHTML = '☰';
+                menuBtn.style.cssText = `
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    display: none;
+                    padding: 0.5rem;
+                `;
 
-                    if (window.innerWidth <= 768) {
-                        menuBtn.style.display = 'block';
-                        const navLinks = document.querySelector('.nav-links');
+                const navLinks = document.querySelector('.nav-links');
 
-                        menuBtn.addEventListener('click', () => {
-                            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
-                            navLinks.style.position = 'absolute';
-                            navLinks.style.top = '100%';
-                            navLinks.style.left = '0';
-                            navLinks.style.right = '0';
-                            navLinks.style.background = 'var(--primary)';
-                            navLinks.style.flexDirection = 'column';
-                            navLinks.style.padding = '1rem';
-                        });
+                menuBtn.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                    menuBtn.innerHTML = navLinks.classList.contains('active') ? '✕' : '☰';
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!nav.contains(e.target) && navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                        menuBtn.innerHTML = '☰';
                     }
+                });
 
-                    nav.appendChild(menuBtn);
-                }
+                // Close menu when clicking on a link
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        navLinks.classList.remove('active');
+                        menuBtn.innerHTML = '☰';
+                    });
+                });
+
+                nav.appendChild(menuBtn);
             }
         };
 
